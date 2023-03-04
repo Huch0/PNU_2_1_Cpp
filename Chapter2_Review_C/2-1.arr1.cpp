@@ -1,16 +1,15 @@
-//2-1. arr1.cpp ½Ç½À¿¹Á¦ 2.1
+//2-1. arr1.cpp ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ 2.1
 #include <stdio.h>
 #include <stdlib.h>
-//1 Â÷¿ø ¹è¿­¿¡ ´ëÇÑ pointer »ç¿ë
-void main(){
+//1 ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ pointer ï¿½ï¿½ï¿½
+int main(){
     int odd[5] = {3, 5, 7, 9, 11};
     printf("&odd[0] = %p\n", &odd[0]);
     printf("odd = %p\n", odd);
-	printf("odd+1 = %p\n", odd+1); //¹è¿­ÀÇ µÎ¹øÂ° ¿ø¼ÒÀÇ ÁÖ¼Ò
+	printf("odd+1 = %p\n", odd+1); //ï¿½è¿­ï¿½ï¿½ ï¿½Î¹ï¿½Â° ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼ï¿½
     printf("odd[0] = %d\n", odd[0]);
     printf("*odd = %d\n", *odd);
     printf("*odd+1 = %d\n", *odd+1);
     printf("*(odd+1) = %d\n\n", *(odd+1));
 	system("pause");
-
 } 
