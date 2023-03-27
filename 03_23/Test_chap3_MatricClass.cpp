@@ -11,7 +11,25 @@ public:
         this->cols = col;
         this->Term = new int[row * col];
     }
-	//~Matrix() { delete[]Term; }
+	Matrix(const Matrix& other) {
+        this->rows = other.rows;
+        this->cols = other.cols;
+        this->Term = new int[this->rows * this->cols];
+        memcpy(this->Term, other.Term, sizeof(int) * this->rows * this->cols);
+    }
+
+	Matrix& operator=(const Matrix& other) {
+        if (this != &other) {
+            delete[] this->Term;
+            this->rows = other.rows;
+            this->cols = other.cols;
+            this->Term = new int[this->rows * this->cols];
+            memcpy(this->Term, other.Term, sizeof(int) * this->rows * this->cols);
+        }
+        return *this;
+    }
+
+	~Matrix() { delete[]Term; }
 	int GetData();
 	int Display(); // ��� ���: A[rows][cols] ���
 
@@ -51,6 +69,7 @@ Matrix Matrix::Add(Matrix& b) {
 	}
 
 	Matrix result(rows, cols);
+	cout << result.Term << endl;
 	for (int i = 0; i < this->rows; i++) {
 		for (int j = 0; j < this->cols; j++) {
 			result.Term[i * cols + j] = this->Term[i * cols + j] + b.Term[i * cols + j];
@@ -74,6 +93,7 @@ Matrix Matrix::Transpose(){
 
 	return Transposed;
 }
+
 int dotProduct(int* row, int* col, int vector_len) {
 	int sum = 0;
 
@@ -90,7 +110,7 @@ Matrix Matrix::Multiply(Matrix& b) {
 	}
 
 	Matrix result(this->rows, b.cols);
-	Matrix bT = b.Transpose();
+	Matrix bT = b.Transpose(); //copy constructor 
 	for (int i = 0; i < result.rows; i++) {
 		for (int j = 0; j < result.cols; j++) {
 			result.Term[i * result.cols + j] = dotProduct(this->Term + i * this->cols, bT.Term + j * bT.cols, bT.cols);
