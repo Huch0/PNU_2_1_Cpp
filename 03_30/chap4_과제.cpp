@@ -6,14 +6,93 @@ private:
 	float real;
 	float imaginary;
 public:
+	ComplexNumber(float real, float imaginary) {
+		this->real = real;
+		this->imaginary = imaginary;
+	}
+	~ComplexNumber() {};
 
 	friend ostream& operator<<(ostream& stream, const ComplexNumber& p);
+	
+	ComplexNumber add(const ComplexNumber& other);
+	ComplexNumber subtract(const ComplexNumber& other);
+	ComplexNumber multiply(const ComplexNumber& other);
+	ComplexNumber divide(const ComplexNumber& other);
+	//assignment
+	ComplexNumber& operator=(const ComplexNumber& other);
+	//cascading add
+	ComplexNumber operator+(const ComplexNumber& other);
 	
 };
 
 ostream& operator<<(ostream& stream, const ComplexNumber& p) {
 	stream << p.real << " + " << p.imaginary << "i";
 	return stream;
+}
+
+ComplexNumber ComplexNumber::add(const ComplexNumber& other) {
+	this->real += other.real;
+	this->imaginary += other.imaginary;
+
+	return *this;
+}
+
+ComplexNumber ComplexNumber::subtract(const ComplexNumber& other) {
+	cout << endl << *this << " - " << other << endl;
+
+	this->real -= other.real;
+	this->imaginary -= other.imaginary;
+
+	return *this;
+}
+
+// (a+bi) * (c+di) = ac+adi+bci-bd = (ac-bd)+(ad+bc)i
+ComplexNumber ComplexNumber::multiply(const ComplexNumber& other) {
+	float a = this->real;
+	float b = this->imaginary;
+	float c = other.real;
+	float d = other.imaginary;
+
+	this->real = a * c - b * d;
+	this->imaginary = a * d + b * c;
+
+	return *this;
+}
+
+// (a+bi) / (c+di) = (a+bi)(c-di)/(c^2+d^2) 
+//                 = (ac-adi+bci+bd)/(c^2+d^2)
+//                 = ((ac+bd)+(bc-ad)i)/(c^2+d^2)
+//                 = (ac+bd)/(c^2+d^2)+(bc-ad)/(c^2+d^2)i
+ComplexNumber ComplexNumber::divide(const ComplexNumber& other) {
+	cout << endl << *this << " / " << other << endl;
+
+	float a = this->real;
+	float b = this->imaginary;
+	float c = other.real;
+	float d = other.imaginary;
+
+	this->real = (a * c + b * d) / (c * c + d * d);
+	this->imaginary = (b * c - a * d) / (c * c + d * d);
+
+	return *this;
+}
+//assignment
+ComplexNumber& ComplexNumber::operator=(const ComplexNumber& other) {
+	if (this != &other) {
+		this->real = other.real;
+		this->imaginary = other.imaginary;
+
+		return *this;
+	}
+}
+//cascading add
+ComplexNumber ComplexNumber::operator+(const ComplexNumber& other) {
+	cout << endl << *this << " + " << other << endl;
+	ComplexNumber result(0, 0);
+	result.real = this->real + other.real;
+	result.imaginary = this->imaginary + other.imaginary;
+
+	return result;
 }
 
 int main(void) {
