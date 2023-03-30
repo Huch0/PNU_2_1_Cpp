@@ -21,7 +21,7 @@ public:
 	//assignment
 	ComplexNumber& operator=(const ComplexNumber& other);
 	//cascading add
-	ComplexNumber operator+(const ComplexNumber& other);
+	ComplexNumber& operator+(const ComplexNumber& other);
 	
 };
 
@@ -86,13 +86,13 @@ ComplexNumber& ComplexNumber::operator=(const ComplexNumber& other) {
 	}
 }
 //cascading add
-ComplexNumber ComplexNumber::operator+(const ComplexNumber& other) {
+ComplexNumber& ComplexNumber::operator+(const ComplexNumber& other) {
 	cout << endl << *this << " + " << other << endl;
-	ComplexNumber result(0, 0);
-	result.real = this->real + other.real;
-	result.imaginary = this->imaginary + other.imaginary;
 
-	return result;
+	this->real += other.real;
+	this->imaginary += other.imaginary;
+
+	return *this;
 }
 
 int main(void) {
