@@ -14,10 +14,10 @@ public:
 
 	friend ostream& operator<<(ostream& stream, const ComplexNumber& p);
 	
-	ComplexNumber add(const ComplexNumber& other);
-	ComplexNumber subtract(const ComplexNumber& other);
-	ComplexNumber multiply(const ComplexNumber& other);
-	ComplexNumber divide(const ComplexNumber& other);
+	ComplexNumber& add(const ComplexNumber& other);
+	ComplexNumber& subtract(const ComplexNumber& other);
+	ComplexNumber& multiply(const ComplexNumber& other);
+	ComplexNumber& divide(const ComplexNumber& other);
 	//assignment
 	ComplexNumber& operator=(const ComplexNumber& other);
 	//cascading add
@@ -30,14 +30,14 @@ ostream& operator<<(ostream& stream, const ComplexNumber& p) {
 	return stream;
 }
 
-ComplexNumber ComplexNumber::add(const ComplexNumber& other) {
+ComplexNumber& ComplexNumber::add(const ComplexNumber& other) {
 	this->real += other.real;
 	this->imaginary += other.imaginary;
 
 	return *this;
 }
 
-ComplexNumber ComplexNumber::subtract(const ComplexNumber& other) {
+ComplexNumber& ComplexNumber::subtract(const ComplexNumber& other) {
 	cout << endl << *this << " - " << other << endl;
 
 	this->real -= other.real;
@@ -47,7 +47,7 @@ ComplexNumber ComplexNumber::subtract(const ComplexNumber& other) {
 }
 
 // (a+bi) * (c+di) = ac+adi+bci-bd = (ac-bd)+(ad+bc)i
-ComplexNumber ComplexNumber::multiply(const ComplexNumber& other) {
+ComplexNumber& ComplexNumber::multiply(const ComplexNumber& other) {
 	float a = this->real;
 	float b = this->imaginary;
 	float c = other.real;
@@ -63,7 +63,7 @@ ComplexNumber ComplexNumber::multiply(const ComplexNumber& other) {
 //                 = (ac-adi+bci+bd)/(c^2+d^2)
 //                 = ((ac+bd)+(bc-ad)i)/(c^2+d^2)
 //                 = (ac+bd)/(c^2+d^2)+(bc-ad)/(c^2+d^2)i
-ComplexNumber ComplexNumber::divide(const ComplexNumber& other) {
+ComplexNumber& ComplexNumber::divide(const ComplexNumber& other) {
 	cout << endl << *this << " / " << other << endl;
 
 	float a = this->real;
