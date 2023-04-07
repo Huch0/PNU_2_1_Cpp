@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
 /*
-queue¸¦ C++ÀÇ class¸¦ »ç¿ë > Å¥ µ¥ÀÌÅÍ ¸â¹ö°¡ person °´Ã¼ > personÀÇ nameÀÌ char* ¹®ÀÚ¿­·Î ±¸Çö
+queueë¥¼ C++ì˜ classë¥¼ ì‚¬ìš© > í ë°ì´í„° ë©¤ë²„ê°€ person ê°ì²´ > personì˜ nameì´ char* ë¬¸ìì—´ë¡œ êµ¬í˜„
 */
 using namespace std;
 
@@ -12,8 +12,8 @@ class Person {
     int age;
 public:
     friend ostream& operator<<(ostream& stream, const Person& p);
-    //Person p0("s1", "hong", 12);
-    Person(char* pid, char* pname, int age) {
+
+    Person(char* pid, char* pname, int age) {  
         this->pid = new char[strlen(pid) + 1];
         strcpy(this->pid, pid);
 
@@ -22,24 +22,21 @@ public:
 
         this->age = age;
     }
-    Person(Person& other) {
-        if (this != &other) {
-            delete[] this->pid;
-            this->pid = new char[strlen(other.pid) + 1];
-            strcpy(this->pid, other.pid);
+    Person(Person& pp) {
+        this->pid = new char[strlen(pp.pid) + 1];
+        strcpy(this->pid, pp.pid);
 
+        this->pname = new char[strlen(pp.pname) + 1];
+        strcpy(this->pname, pp.pname);
 
-            delete[] this->pname;
-            this->pname = new char[strlen(other.pname) + 1];
-            strcpy(this->pname, other.pname);
-
-            this->age = other.age;
-        }
+        this->age = pp.age;
     }
+    
+    
     ~Person() {
+        delete this->pid;
+        delete this->pname;
     };
-
-
 };
 
 ostream& operator<<(ostream& stream, const Person& p) {
@@ -63,10 +60,14 @@ public:
         this->front = 0;
         this->rear = 0;
     }
-    ~Queue() {};
+    ~Queue() {
+        for (int i = this->front; i < this->rear; i++) {
+            delete this->queue[i];
+        }
+    };
 
     void Add(Person& pp);
-    Person& Delete();
+    Person* Delete();
     void Show();
 
 
@@ -76,22 +77,23 @@ void Queue::Add(Person& pp) {
         cout << "queue is full" << endl;
         return;
     }
+    Person* dynamicPerson = new Person(pp);
     //cout << pp << &pp << endl;
-    this->queue[this->rear] = &pp;
+    this->queue[this->rear] = dynamicPerson;
     this->rear += 1;
     return;
 }
-Person& Queue::Delete() {
+Person* Queue::Delete() {
     if (this->front == this->rear) {
         cout << "queue empty" << endl;
-        return Person("","",0);
+        return nullptr;
     }
-    Person result = *(this->queue[this->front]);
-    this->queue[this->front] = 0;
+    Person* result = this->queue[this->front];
+    this->queue[this->front] = nullptr;
     this->front += 1;
-
     return result;
 }
+
 void Queue::Show() {
     for (int i = this->front; i < this->rear; i++) {
         //cout << this->front << ", " << this->rear << endl;
@@ -111,12 +113,13 @@ int main() {
         char sname[20];
         int year;
         int select;
-        cout << "\nSelect command 1: AddBatch(), 2: AddOne(1°³ °´Ã¼¸¦ È­¸é ÀÔ·Â¹Ş¾Æ), 3. Delete, 4: Show, 5. quit => ";
+        
+        cout << "\nSelect command 1: AddBatch(), 2: AddOne(1ê°œ ê°ì²´ë¥¼ í™”ë©´ ì…ë ¥ë°›ì•„), 3. Delete, 4: Show, 5. quit => ";
         cin >> select;
         switch (select) {
             case 1: {
                 //AddBatch
-                cout << endl << "10°³ Å¥¿¡ ÀÔ·Â" << endl;   
+                cout << endl << "10ê°œ íì— ì…ë ¥" << endl;
                 Person p0("s1", "hong", 12);
                 Person p1("s2", "kim", 22);
                 Person p2("s3", "lee", 23);
@@ -130,9 +133,9 @@ int main() {
             }
             case 2: {
                 //AddOne
-                cout << endl << "1°³ °´Ã¼¸¦ È­¸é ÀÔ·Â¹Ş¾Æ" << endl;
+                cout << endl << "1ê°œ ê°ì²´ë¥¼ í™”ë©´ ì…ë ¥ë°›ì•„" << endl;
                 cin >> sno >> sname >> year;
-                Person px = Person(sno, sname, year);
+                Person px(sno, sname, year);
                 q1.Add(px);
                 break;
             }
@@ -140,19 +143,23 @@ int main() {
             case 3: {
                 //Delete
                 cout << endl << "Delete" << endl;
-                Person result = q1.Delete();
-                cout << "»èÁ¦µÈ °´Ã¼:";
-                q2.Add(result);
-                cout << result;
+                Person* result_ptr = q1.Delete();
+                if (result_ptr != nullptr) {
+                    cout << "ì‚­ì œëœ ê°ì²´:";
+                    Person result(*result_ptr);
+                    q2.Add(result);
+                    cout << result;
+                    delete result_ptr;
+                }
                 break;
             }
             case 4: {
-                //Show - Å¥ÀÇ »óÅÂ¸¦ Ãâ·Â
+                //Show - íì˜ ìƒíƒœë¥¼ ì¶œë ¥
                 cout << endl << "front = "  << endl;
                 cout << "rear = " << endl;
-                //Å¥¿¡ ÀÖ´Â °´Ã¼µéÀ» show()¸¦ »ç¿ëÇÏ¿© Ãâ·Â
+                //íì— ìˆëŠ” ê°ì²´ë“¤ì„ show()ë¥¼ ì‚¬ìš©í•˜ì—¬ ì¶œë ¥
                 q1.Show();
-                cout << "»èÁ¦µÈ °´Ã¼µéÀ» ÀúÀåÇÑ q2ÀÇ °´Ã¼µéÀ» Ãâ·Â";
+                cout << "ì‚­ì œëœ ê°ì²´ë“¤ì„ ì €ì¥í•œ q2ì˜ ê°ì²´ë“¤ì„ ì¶œë ¥";
                 q2.Show();
                 break;
             }
