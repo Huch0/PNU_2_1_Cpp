@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
 /*
-queueë¥¼ C++ì˜ classë¥¼ ì‚¬ìš© > í ë°ì´í„° ë©¤ë²„ê°€ person ê°ì²´ > personì˜ nameì´ char* ë¬¸ìžì—´ë¡œ êµ¬í˜„
+queue¸¦ C++ÀÇ class¸¦ »ç¿ë > Å¥ µ¥ÀÌÅÍ ¸â¹ö°¡ person °´Ã¼ > personÀÇ nameÀÌ char* ¹®ÀÚ¿­·Î ±¸Çö
 */
 using namespace std;
 
@@ -69,9 +69,16 @@ public:
     void Add(Person& pp);
     Person* Delete();
     void Show();
-
+    int getFront();
+    int getRear();
 
 };
+int Queue::getFront() {
+	return this->front;
+}
+int Queue::getRear() {
+	return this->rear;
+}
 void Queue::Add(Person& pp) {
     if (this->rear == 100) {
         cout << "queue is full" << endl;
@@ -114,12 +121,12 @@ int main() {
         int year;
         int select;
         
-        cout << "\nSelect command 1: AddBatch(), 2: AddOne(1ê°œ ê°ì²´ë¥¼ í™”ë©´ ìž…ë ¥ë°›ì•„), 3. Delete, 4: Show, 5. quit => ";
+        cout << "\nSelect command 1: AddBatch(), 2: AddOne(1°³ °´Ã¼¸¦ È­¸é ÀÔ·Â¹Þ¾Æ), 3. Delete, 4: Show, 5. quit => ";
         cin >> select;
         switch (select) {
             case 1: {
                 //AddBatch
-                cout << endl << "10ê°œ íì— ìž…ë ¥" << endl;
+                cout << endl << "10°³ Å¥¿¡ ÀÔ·Â" << endl;
                 Person p0("s1", "hong", 12);
                 Person p1("s2", "kim", 22);
                 Person p2("s3", "lee", 23);
@@ -133,7 +140,7 @@ int main() {
             }
             case 2: {
                 //AddOne
-                cout << endl << "1ê°œ ê°ì²´ë¥¼ í™”ë©´ ìž…ë ¥ë°›ì•„" << endl;
+                cout << endl << "1°³ °´Ã¼¸¦ È­¸é ÀÔ·Â¹Þ¾Æ" << endl;
                 cin >> sno >> sname >> year;
                 Person px(sno, sname, year);
                 q1.Add(px);
@@ -145,7 +152,7 @@ int main() {
                 cout << endl << "Delete" << endl;
                 Person* result_ptr = q1.Delete();
                 if (result_ptr != nullptr) {
-                    cout << "ì‚­ì œëœ ê°ì²´:";
+                    cout << "»èÁ¦µÈ °´Ã¼:";
                     Person result(*result_ptr);
                     q2.Add(result);
                     cout << result;
@@ -154,12 +161,12 @@ int main() {
                 break;
             }
             case 4: {
-                //Show - íì˜ ìƒíƒœë¥¼ ì¶œë ¥
-                cout << endl << "front = "  << endl;
-                cout << "rear = " << endl;
-                //íì— ìžˆëŠ” ê°ì²´ë“¤ì„ show()ë¥¼ ì‚¬ìš©í•˜ì—¬ ì¶œë ¥
+                //Show - Å¥ÀÇ »óÅÂ¸¦ Ãâ·Â 
+                cout << endl << "front = "  << q1.getFront() << endl;
+                cout << "rear = " << q1.getRear() << endl;
+                //Å¥¿¡ ÀÖ´Â °´Ã¼µéÀ» show()¸¦ »ç¿ëÇÏ¿© Ãâ·Â
                 q1.Show();
-                cout << "ì‚­ì œëœ ê°ì²´ë“¤ì„ ì €ìž¥í•œ q2ì˜ ê°ì²´ë“¤ì„ ì¶œë ¥";
+                cout << "»èÁ¦µÈ °´Ã¼µéÀ» ÀúÀåÇÑ q2ÀÇ °´Ã¼µéÀ» Ãâ·Â" << endl;
                 q2.Show();
                 break;
             }
