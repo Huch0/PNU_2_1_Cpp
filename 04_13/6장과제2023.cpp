@@ -10,7 +10,7 @@ class String {
 public:
     String() {
         this->data = new char[1];
-        strcpy(this->data, "\0");
+        this->data[0] = '\0';
     }
     String(char* data) {
         this->data = new char[strlen(data) + 1];
@@ -125,6 +125,7 @@ int Person::operator>(Person& other) {
         if (this->age > other.age) {
             return 1;
         }    
+        return 0;
     } else {
         return 0;
     }
@@ -138,14 +139,11 @@ ostream& operator<<(ostream& stream, const Person& p) {
 
 class Stack {
     int top;
-    Person* items[100];
+    Person* items[100] = { nullptr };
 
 public:
     Stack() {
         this->top = 0; 
-        for (int i = 0; i < 100; i++) {
-            this->items[i] = nullptr;
-        }
     }
     ~Stack() {
         for (int i = 0; i < this->top; i++) {
