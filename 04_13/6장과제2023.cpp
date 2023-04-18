@@ -10,6 +10,7 @@ class String {
 public:
     String() {
         this->data = new char[1];
+        strcpy(this->data, "\0");
     }
     String(char* data) {
         this->data = new char[strlen(data) + 1];
@@ -293,7 +294,6 @@ int main() {
                 s2.~Stack();
                 cout << "after s2 deleted" << endl;
                 s1.show();
-                break;
             }
             default: {
                 exit(0);
