@@ -1,4 +1,4 @@
-//7Àå Å¬·¡½º »ó¼Ó °úÁ¦
+//7ì¥ í´ë˜ìŠ¤ ìƒì† ê³¼ì œ
 #include <iostream>
 #include <string>
 using namespace std;
@@ -11,19 +11,32 @@ public:
     }
     Dept(char* dname, char* city) {
         strcpy(this->dname, dname);
-        this->city = city;
+        this->city = new char[strlen(city) + 1];
+        strcpy(this->city, city);
     };
     ~Dept() {
-        delete this->city;
+        delete[] this->city;
     }
 
-    ostream& operator<<(Dept&);
+    friend ostream& operator<<(ostream& stream, Dept&);
+    int operator > (Dept& another);
 };
+
+ostream& operator <<(ostream& stream, Dept& d) {
+    stream << "dept_name : " << d.dname << " city : " << d.city;
+
+    return stream;
+}
+int Dept::operator >(Dept& another) {
+    if (strcmp(this->dname, another.dname) > 0) 
+        return 1;
+    else    
+        return 0;
+}
 class Person {
 private:
 	string pid;
 	string pname;
-	ostream& operator<<(Person&);
 public:
     Person() {
         this->pid = "";
@@ -34,14 +47,26 @@ public:
         this->pname = pname;
     };
   
+    friend ostream& operator <<(ostream& stream, Person&);
+    void ChangePidPname(string pid, string pname);
 };
+void Person::ChangePidPname(string pid, string pname) {
+    this->pid = pid;
+    this->pname = pname;
+}
+ostream& operator <<(ostream& stream, Person& p) {
+    stream << "Person Info : " << endl;
+    stream << "pid : " << p.pid << " pname : " << p.pname << endl;
+    return stream;
+}
 class Employee : protected Person {
 private:
 	char* eno;
 	Dept* dname;
 protected: 
 	void MoveDept(Dept* dname);
-	ostream& operator<<(Employee&);
+    void ChangeEno(char* eno);
+	friend ostream& operator <<(ostream& stream, Employee& e);
 public:
     Employee() : Person() {
         this->eno = new char[1];
@@ -49,14 +74,39 @@ public:
         this->dname = new Dept();
     }
     Employee(char* eno, Dept* dname, string pid, string pname) : Person(pid, pname) {
-        this->eno = eno; this->dname = dname;
-        // this->pid = pid; this->pname = pname; pid, pnameÀº privateÀÌ¶ó »ç¿ë¸øÇÔ.
+        this->eno = new char[strlen(eno) + 1];
+        strcpy(this->eno, eno);
+        
+        this->dname = dname;
+        // this->pid = pid; this->pname = pname; pid, pnameì€ privateì´ë¼ ì‚¬ìš©ëª»í•¨.
     };
     ~Employee() {
         delete this->eno;
         delete this->dname;
     }
+    Dept& get_Dept();
 };
+void Employee::MoveDept(Dept* dname) {
+    delete this->dname;
+    this->dname = dname;
+}
+void Employee::ChangeEno(char* eno) {
+    delete this->eno;
+    this->eno = new char[strlen(eno) + 1];
+    strcpy(this->eno, eno);
+}
+
+ostream& operator <<(ostream& stream, Employee& e) {
+    stream << "Employee Info : " << endl;
+    stream << "eno : " << e.eno << " " << *e.dname << endl;
+    stream << static_cast<Person&>(e) << endl;
+    return stream;
+}
+
+Dept& Employee::get_Dept() {
+    return *(this->dname);
+}
+
 class Coder : private Employee {
 private:
 	char* language;
@@ -77,70 +127,132 @@ public:
     ~Coder() {
         delete this->language;
     }
-	void MoveDept(Dept* dname);//ºÎ¼­ ÀÌµ¿
+	void MoveDept(Dept* dname);//ë¶€ì„œ ì´ë™
     friend istream& operator >>(istream& stream, Coder& c);
     friend ostream& operator <<(ostream& stream, Coder& c);
-    int operator > (Coder&);//
+    int operator >(Coder& another);//
+    //Dept : char dname[10]
+    int cmp_Dept(Coder& another) {
+        if(this->get_Dept() > another.get_Dept()) 
+            return 1;
+        else    
+            return 0;
+    }
 };
+void Coder::MoveDept(Dept* dname) {
+    this->Employee::MoveDept(dname);
+}
+//Coder(char* language, double workYears, char* eno, Dept* dname, string pid, string pname)
 istream& operator >>(istream& stream, Coder& c) {
-    char tmp[20];
-    stream >> tmp >> c.workYears;
-    c.language = new char[strlen(tmp) + 1];
-    strcpy(c.language, tmp);
+    char language[20];
+    char eno[20];
+    char dname[10];
+    char city[20];
+    string pid;
+    string pname;
+    cout << "Input Language, Work years, eno, dname, city, pid, pname : " << endl;
+
+    stream >> language >> c.workYears >> eno >> dname >> city >> pid >> pname;
+    c.language = new char[strlen(language) + 1];
+    strcpy(c.language, language);
+    c.ChangeEno(eno);
+    Dept* tmp_Dept = new Dept(dname, city);
+    c.MoveDept(tmp_Dept);
+    c.ChangePidPname(pid, pname);
 
     return stream;
 }
-ostream& operator <<(ostream& stream, Coder& c) {
+ostream& operator<<(ostream& stream, Coder& c) {
+    stream << "Coder Info : " << endl;
     stream << "Language : " << c.language << " Workyears : " << c.workYears << endl;
-    
+    stream << static_cast<Employee&>(c) << endl;
     return stream;
 }
+int Coder::operator > (Coder& another) {
+    return (this->workYears > another.workYears);
+}
+
 int main() {
     Coder* codings[20];
     Coder c0, c1, c2, c3;
     codings[0] = &c0; codings[1] = &c1; codings[2] = &c2; codings[3] = &c3;
+
+    Coder* coder_0 = new Coder("C", 5, "20200001", new Dept("sss", "Busan"), string("011220"), string("Kim"));
+    Coder* coder_1 = new Coder("C++", 20, "20220012", new Dept("sss", "Seoul"), string("001112"), string("Lee"));
+    Coder* coder_2 = new Coder("C#", 5, "20220013", new Dept("bbb", "Gwangju"), string("991212"), string("Park"));
+    Coder* coder_3 = new Coder("Java", 14, "20200002", new Dept("bbb", "Ulsan"), string("901010"), string("Jung"));
+    Coder* coder_4 = new Coder("Python", 12, "20200041", new Dept("ddd", "Daegu"), string("010101"), string("Won"));
+    Coder* coder_5 = new Coder("C++", 10, "20230001", new Dept("ddd", "Seoul"), string("050101"), string("Seo"));
+    Coder* coder_6 = new Coder("Javascript", 20, "20190012", new Dept("fff", "Seoul"), string("010102"), string("Joo"));
+    Coder* coder_7 = new Coder("Rust", 10, "20200005", new Dept("fff", "Suwon"), string("000101"), string("Woo"));
+    Coder* coder_8 = new Coder("C", 50, "20190013", new Dept("aaa", "Busan"), string("011113"), string("Heo"));
+    Coder* coder_9 = new Coder("Rust", 100, "20150001", new Dept("aaa", "Jeonju"), string("920101"), string("Son"));
     int len_codings = 0;
     while (1)
     {
        
         int select;
-        //»ı¼ºÀÚ »ç¿ë¿¡ ÀÇÇÑ ÀÔ·ÂÀº new Coder("ÀÌ¸§", ...)À¸·Î °ªÀ» ÁöÁ¤ÇÏ¿© ÀÔ·Â
-        cout << "\n¼±ÅÃ 1: °´Ã¼ 4°³ ÀÔ·Â(cin »ç¿ë), 2. °´Ã¼ 10°³ ÀÔ·Â(»ı¼ºÀÚ »ç¿ë), 3: °´Ã¼ Á¤·Ä(Dept ÀÌ¸§)°ú Ãâ·Â,4. °´Ã¼ Á¤·Ä(Coder workYears)°ú Ãâ·Â, 5. Á¾·á" << endl;
+        //ìƒì„±ì ì‚¬ìš©ì— ì˜í•œ ì…ë ¥ì€ new Coder("ì´ë¦„", ...)ìœ¼ë¡œ ê°’ì„ ì§€ì •í•˜ì—¬ ì…ë ¥
+        cout << "\nì„ íƒ 1: ê°ì²´ 4ê°œ ì…ë ¥(cin ì‚¬ìš©), 2. ê°ì²´ 10ê°œ ì…ë ¥(ìƒì„±ì ì‚¬ìš©), 3: ê°ì²´ ì •ë ¬(Dept ì´ë¦„)ê³¼ ì¶œë ¥,4. ê°ì²´ ì •ë ¬(Coder workYears)ê³¼ ì¶œë ¥, 5. ì¢…ë£Œ" << endl;
         cin >> select;
         switch (select) {
-        case 1://1: °´Ã¼ 4°³ ÀÔ·Â(cin »ç¿ë)
+        case 1://1: ê°ì²´ 4ê°œ ì…ë ¥(cin ì‚¬ìš©)
             for (int i = 0; i < 4; i++) {
-                cin >> *codings[i]; //pointer ÀÔ·Â
-                len_codings += 1;
+                cin >> *codings[i]; //pointer ì…ë ¥
             }
 
-            // ÀÌ ¹ØÀº Ãß°¡µÈ ÄÚµå
+            len_codings = 4;
+            // ì´ ë°‘ì€ ì¶œë ¥ì„ ìœ„í•´ ì¶”ê°€ëœ ì½”ë“œ
             for (int i = 0; i < 4; i++) {
                 cout << *codings[i]; 
             }
             //
             break;
-        case 2://2. °´Ã¼ 10°³ ÀÔ·Â(»ı¼ºÀÚ »ç¿ë)
+        case 2://2. ê°ì²´ 10ê°œ ì…ë ¥(ìƒì„±ì ì‚¬ìš©)
+            //Coder(char* language, double workYears, char* eno, Dept* dname, string pid, string pname)
+            len_codings = 10;
+            codings[0] = coder_0; codings[1] = coder_1; codings[2] = coder_2; codings[3] = coder_3; codings[4] = coder_4; 
+            codings[5] = coder_5; codings[6] = coder_6; codings[7] = coder_7; codings[8] = coder_8; codings[9] = coder_9; 
+
+            // ì´ ë°‘ì€ ì¶œë ¥ì„ ìœ„í•´ ì¶”ê°€ëœ ì½”ë“œ
             for (int i = 0; i < 10; i++) {
-                Coder* input_coder = new Coder();
-                cin >> *input_coder;
-                codings[i] = input_coder;
-                len_codings += 1;
+                cout << *codings[i]; 
             }
+            //
 
             break;
 
-        case 3://3: °´Ã¼ Á¤·Ä(Dept ÀÌ¸§À¸·Î Á¤·Ä)°ú Ãâ·Â
+        case 3://3: ê°ì²´ ì •ë ¬(Dept ì´ë¦„ìœ¼ë¡œ ì •ë ¬)ê³¼ ì¶œë ¥
             for (int i = 0; i < len_codings; i++) {
+                for (int j = 0; j < len_codings - i - 1; j++) {
+                    if (codings[j]->cmp_Dept(*(codings[j + 1]))) {
+                        Coder* tmp = codings[j];
+                        codings[j] = codings[j + 1];
+                        codings[j + 1] = tmp;
+                    }
+                }
+            }
 
+            for (int i = 0; i < len_codings; i++) {
+                cout << *codings[i] << endl;
             }
 
             break;
-        case 4://4. °´Ã¼ Á¤·Ä(Coder workYears·Î Á¤·Ä)°ú Ãâ·Â
-            for (int i = 0; i < len_codings; i++) {
-
-            }
+        case 4://4. ê°ì²´ ì •ë ¬(Coder workYearsë¡œ ì •ë ¬)ê³¼ ì¶œë ¥
             
+            for (int i = 0; i < len_codings; i++) {
+                for (int j = 0; j < len_codings - i - 1; j++) {
+                    if (*(codings[j]) > *(codings[j + 1])) {
+                        Coder* tmp = codings[j];
+                        codings[j] = codings[j + 1];
+                        codings[j + 1] = tmp;
+                    }
+                }
+            }
+
+            for (int i = 0; i < len_codings; i++) {
+                cout << *codings[i] << endl;
+            }
             break;
 
         default:
@@ -148,6 +260,7 @@ int main() {
             break;
         }
     }
+    delete coder_1;
     system("pause");
     return 1;
 }
