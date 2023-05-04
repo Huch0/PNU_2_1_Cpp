@@ -208,6 +208,30 @@ int PartTimeStudent::operator > (PartTimeStudent& another) {
         return 0;
 }
 
+template<typename T>
+class Bag {
+private:
+    T* items[10];
+    int front;
+    int rear;
+public:
+    Bag() {
+        for (int i = 0; i < 10; i++) {
+            items[i] = nullptr;
+        }
+    }
+    ~Bag() {
+        for (int i = 0; i < 10; i++) {
+            delete items[i];
+        }
+    }
+    void add(T* item);
+    T* find(T& item);
+    void delete();
+    void print();
+};
+
+
 int main() {
     Coder *codings[10];
     PartTimeStudent* workStudents[10];
