@@ -1,12 +1,12 @@
 /*
-* °´Ã¼µéÀÇ SetÀ» Æ÷ÇÔÇÏ´Â Å×ÀÌºíÀÇ ¹è¿­À» °®´Â Å¬·¡½º ±¸ÇöÇÏ±â
+* ê°ì²´ë“¤ì˜ Setì„ í¬í•¨í•˜ëŠ” í…Œì´ë¸”ì˜ ë°°ì—´ì„ ê°–ëŠ” í´ë˜ìŠ¤ êµ¬í˜„í•˜ê¸°
 */
 #include <iostream>
 #include <string>
 #define DefaultSize 50
 using namespace std;
 class Employee;
-class Person { //Ãß»ó Å¬·¡½º·Î ±¸ÇöÇÑ´Ù
+class Person { //ì¶”ìƒ í´ë˜ìŠ¤ë¡œ êµ¬í˜„í•œë‹¤
 public:
     string GetName() { return pname; }
     void SetName(char* str) { pname = str; }
@@ -14,12 +14,15 @@ public:
     string pname;
     Person() {}
     Person(string pid, string pname) : pid(pid), pname(pname) { }
-    virtual void Print() = 0;
+    virtual void Print();
     virtual bool Equals(Employee*) = 0;
     virtual ~Person() {}
 
 };
-
+void Person::Print() {
+    cout << "|" << pid << " | " << pname << " |";
+    return;
+}
 class Employee : public Person {
 private:
     string eno;
@@ -28,9 +31,18 @@ public:
     Employee() :Person() {}
     Employee(string pid, string pname, string eno, string role) : Person(pid, pname), eno(eno), role(role) { }
     virtual void Print();
-    virtual bool Equals(Employee* p);
+    virtual bool Equals(Employee* ep);
 };
-
+void Employee::Print() {
+    Person::Print();
+    cout << "| " << eno << " | " << role << " |";
+}
+bool Employee::Equals(Employee* ep) {
+    if (eno == ep->eno && role == ep->role)
+        return 1;
+    else   
+        return 0;
+}
 class Coder : public Employee {
 private:
     string language;
@@ -39,8 +51,10 @@ public:
     Coder(string pid, string pname, string eno, string role, string language) : Employee(pid, pname, eno, role), language(language) {}
     void Print();
 };
-
-
+void Coder::Print() {
+    Employee::Print();
+    cout << "| " << language<<" |";
+}
 class Student : public Employee {
 private:
     string sid;
@@ -49,29 +63,35 @@ public:
     Student(string sid, string major, string eno, string role, string pid, string pname) : Employee(pid, pname, eno, role), sid(sid), major(major) { }
     void Print();
 };
-
-
-
+void Student::Print() {
+    Employee::Print();
+    cout << "| " << sid << " | " << major << " |";
+}
 class Bag {
 public:
-    virtual int Add(Employee*); // Á¤¼ö ÇÏ³ª¸¦ bag¿¡ »ğÀÔ
-    virtual int Delete(char*); //bag¿¡¼­ Á¤¼ö ÇÏ³ª¸¦ »èÁ¦
+    virtual int Add(Employee*); // ì •ìˆ˜ í•˜ë‚˜ë¥¼ bagì— ì‚½ì…
+    virtual int Delete(char*); //bagì—ì„œ ì •ìˆ˜ í•˜ë‚˜ë¥¼ ì‚­ì œ
     virtual Employee* Search(char*);
     bool IsFull();
-    // bagÀÌ Æ÷È­»óÅÂÀÌ¸é true, ±×·¸Áö ¾ÊÀ¸¸é false¸¦ ¹İÈ¯
+    // bagì´ í¬í™”ìƒíƒœì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜
     bool IsEmpty();
-    // bagÀÌ °ø¹é »óÅÂÀÌ¸é true, ±×·¸Áö ¾ÊÀ¸¸é false¸¦ ¹İÈ¯
+    // bagì´ ê³µë°± ìƒíƒœì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜
     int Top();
     virtual void Print();
 
 protected:
-    Bag(int bagSize);
-    void Full(); // bagÀÌ Æ÷È­»óÅÂÀÏ ¶§ÀÇ Á¶Ä¡
-    void Empty(); // bagÀÌ °ø¹é »óÅÂÀÏ ¶§ÀÇ Á¶Ä¡
+    Bag(int bagSize) : bagMaxSize(bagSize), topBag(0) {
+        arr = new Employee*[bagMaxSize];
+        for (int i = 0; i < bagMaxSize; i++) {
+            arr[i] = nullptr;
+        }
+    };
+    void Full(); // bagì´ í¬í™”ìƒíƒœì¼ ë•Œì˜ ì¡°ì¹˜
+    void Empty(); // bagì´ ê³µë°± ìƒíƒœì¼ ë•Œì˜ ì¡°ì¹˜
 
-    Employee** arr; //> »ı¼ºÀÚ¿¡¼­ arr = new Employee*[Size]; > arr[i] = new Employee();
-    int bagMaxSize; // ¹è¿­ÀÇ Å©±â
-    int topBag; // ¹è¿­¿¡¼­ ¿ø¼Ò°¡ µé¾î ÀÖ´Â °¡Àå ³ôÀº À§Ä¡
+    Employee** arr; //> ìƒì„±ìì—ì„œ arr = new Employee*[Size]; > arr[i] = new Employee();
+    int bagMaxSize; // ë°°ì—´ì˜ í¬ê¸°
+    int topBag; // ë°°ì—´ì—ì„œ ì›ì†Œê°€ ë“¤ì–´ ìˆëŠ” ê°€ì¥ ë†’ì€ ìœ„ì¹˜
     //*
     ~Bag() {
         for (int i = 0; i < bagMaxSize; i++) {
@@ -81,31 +101,158 @@ protected:
     }
     // */
 };
+// bagì´ ê³µë°± ìƒíƒœì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜
+bool Bag::IsEmpty() {
+    if (topBag == 0) 
+        return 1;
+    else 
+        return 0;
+}
+// bagì´ í¬í™”ìƒíƒœì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜
+bool Bag::IsFull() {   
+    if (topBag == bagMaxSize)
+        return 1;
+    else 
+        return 0;
+}
+ // bagì´ í¬í™”ìƒíƒœì¼ ë•Œì˜ ì¡°ì¹˜
+void Bag::Full() {
+    cout << "Bag is Full" << endl;
+    return;
+}
+// bagì´ ê³µë°± ìƒíƒœì¼ ë•Œì˜ ì¡°ì¹˜
+void Bag::Empty() {
+    cout << "Bag is Empty" << endl;
+    return;
+}
+// ì •ìˆ˜ í•˜ë‚˜ë¥¼ bagì— ì‚½ì…
+int Bag::Add(Employee* ep) { 
+    if (this->IsFull()) {
+        this->Full();
+        return -1;
+    }
+    arr[topBag] = ep;
+    topBag += 1;
+    
+    cout << "Successfully Added" << endl;
+    return 1;
+}
 
+//bagì—ì„œ ì •ìˆ˜ í•˜ë‚˜ë¥¼ ì‚­ì œ
+int Bag::Delete(char* name) {
+    int searched_index = 0;
+    for (int i = 0; i < topBag; i++) {
+        //cout << i << topBag << " Search : " << arr[i]->GetName() << " " << name << endl;
+        if (arr[i]->GetName() == name) {
+            break;
+        }
+        searched_index += 1;
+    }
+    //cout << "searched_index : " << searched_index << endl;
+    if (searched_index != topBag) {
+        delete arr[searched_index];
+        
+        for (int j = searched_index; j < topBag - 1; j++) {
+            arr[j] = arr[j + 1];
+            if (j != topBag - 1)
+                arr[j + 1] = nullptr;
+        }
+        topBag -= 1;
+        return 1;
+    }
+    cout << "There is no " << name << endl;
+    return -1;
+}
+Employee* Bag::Search(char* name) {
+    for (int i = 0; i < topBag; i++) {
+        //cout << "Search : " << arr[i]->GetName() << " " << name << endl;
+        if (arr[i]->GetName() == name) {
+            return arr[i];
+        }
+    }
+    cout << "There is no " << name << endl;
+    return nullptr;
+}
+int Bag::Top() {
+    return topBag;
+}
+void Bag::Print() {
+    for (int i = 0; i < topBag; i++) {
+        arr[i]->Print();
+        cout << endl;
+    }
+}
 
 class Set : public Bag {
 public:
     Set(int setSize) :Bag(setSize) {}
+    ~Set() {}
     int Add(Employee*);
     int Delete(char*);
     void Print();
     Employee* Search(char*);
 };
+int Set::Add(Employee* ep) {
+    if (this->IsFull()) {
+        this->Full();
+        return -1;
+    }
+    
+    for (int i = 0; i < bagMaxSize; i++) {
+        if (arr[i] == ep) {
+            cout << "Employee already exists" << endl;
+            return -1;
+        }
+    }
 
-
+    return Bag::Add(ep);
+}
+int Set::Delete(char* name) {
+    return Bag::Delete(name);
+}
+void Set::Print() {
+    Bag::Print();
+}
+Employee* Set::Search(char* name) { 
+    return Bag::Search(name);
+}
 class RecordSet : public Set {
-    int setMaxSize;//5°³ÀÇ ·¹ÄÚµå ¼ö
-    int topRecordSet;//ÇØ´ç ·¹ÄÚµå¼¼Æ®¿¡¼­ ÀÔ·ÂÇÒ À§Ä¡
+    int setMaxSize;//5ê°œì˜ ë ˆì½”ë“œ ìˆ˜
+    int topRecordSet;//í•´ë‹¹ ë ˆì½”ë“œì„¸íŠ¸ì—ì„œ ì…ë ¥í•  ìœ„ì¹˜
 public:
-    RecordSet(int maxSize) :Set(maxSize), setMaxSize(maxSize) {
+    RecordSet(int maxSize) : Set(maxSize) {
+        if (maxSize > 5) 
+            setMaxSize = 5;
+        else 
+            setMaxSize = maxSize;
+
         topRecordSet = 0;
     }
+    ~RecordSet() {}
     Employee* Search(char*);
     void Print();
-    int Add(Employee* p);
+    int Add(Employee*);
 };
+Employee* RecordSet::Search(char* name) {
+    return Set::Search(name);
+}
 
+int RecordSet::Add(Employee* ep) {
+    if (topRecordSet == 5) {
+        cout << "Record Set is Full" << endl;
+        return -1;
+    }
 
+    int result = Set::Add(ep);
+    if (result) {
+        topRecordSet += 1;
+    }
+
+    return result;
+}
+void RecordSet::Print() {
+    Set::Print();
+}
 class RecordTable {
     int tableMaxSize;
     int topRecordTable;
@@ -114,62 +261,106 @@ class RecordTable {
 public:
     RecordTable(int numberSet, int numberRecords) :tableMaxSize(numberSet), capacity(numberRecords) {
         topRecordTable = 0;
-        data = new RecordSet * [numberSet];//10°³ÀÇ set
+        data = new RecordSet * [numberSet];//10ê°œì˜ set
         for (int i = 0; i < numberSet; i++) {
-            data[i] = new RecordSet(numberRecords);//°¢ set´Â 5°³ records
+            data[i] = new RecordSet(numberRecords);//ê° setëŠ” 5ê°œ records
         }
     }
-    int Add(Employee*); // Á¤¼ö ÇÏ³ª¸¦ bag¿¡ »ğÀÔ
+    ~RecordTable() {
+        delete[] data;
+    }
+    int Add(Employee*); // ì •ìˆ˜ í•˜ë‚˜ë¥¼ bagì— ì‚½ì…
     int Delete(char*);
     Employee* Search(char*);
     void Print();
 };
+int RecordTable::Add(Employee* ep) {
+    ep->Print();
+    if (topRecordTable == tableMaxSize) {
+        cout << "Record Table is Full" << endl;
+        return -1;
+    }
+    if (data[topRecordTable]->Add(ep) == -1) {
+        topRecordTable += 1;
+        
+        return data[topRecordTable]->Add(ep);
+    } else {
+        return 1;
+    }
+}
+int RecordTable::Delete(char* name) {
+    int count = 0;
+    for (int i = 0; i < topRecordTable; i++) {
+        if (data[i]->Delete(name) == 1)
+            count += 1;
+    }
+    
+    return count;
+}
+Employee* RecordTable::Search(char* name) {
+    Employee* result = nullptr;
 
+    for (int i = 0; i < topRecordTable; i++) {
+        result = data[i]->Search(name);
+        if (result != nullptr) 
+            break;
+    }
+
+    return result;
+}
+void RecordTable::Print() {
+    cout << "Record Table : " << endl;
+    for (int i = 0; i < tableMaxSize; i++) {
+        cout << "Table " << i << " : " << endl;
+        data[i]->Print();
+    }
+    return;
+}
 
 int main() {
-    Employee* members[30];//Employee ¼±¾ğÀ¸·Î º¯°æÇÏ´Â ¹®Á¦ ÇØ°á ÇÊ¿ä 
-    RecordTable table(10, 5);//10°³ÀÇ record sets, °¢ setÀº 5°³ÀÇ records
+    Employee* members[30];//Employee ì„ ì–¸ìœ¼ë¡œ ë³€ê²½í•˜ëŠ” ë¬¸ì œ í•´ê²° í•„ìš” 
+    RecordTable table(10, 5);//10ê°œì˜ record sets, ê° setì€ 5ê°œì˜ records
     int select;
     Employee* p;
     int result;
+    //tableì— ê°ì²´ 30ê°œ ì…ë ¥
+    members[0] = new Coder("p1", "hong", "E1", "Coding", "C++");
+    members[1] = new Coder("p2", "hee", "E2", "Coding", "C++");
+    members[2] = new Coder("p3", "kim", "E3", "Test", "JAVA");
+    members[3] = new Coder("p4", "lee", "E4", "Test", "C#");
+    members[4] = new Coder("p5", "ko", "E5", "Design", "GO");
+    members[5] = new Coder("p6", "choi", "E6", "Design", "GO");
+    members[6] = new Coder("p7", "han", "E7", "Sales", "PYTHON");
+    members[7] = new Coder("p8", "na", "E8", "Sales", "C");
+    members[8] = new Coder("p9", "you", "E9", "Account", "C++");
+    members[9] = new Coder("p10", "song", "E10", "Production", "C#");
+    members[10] = new Student("s011", "coding", "E33", "manager", "23001", "hong");
+    members[11] = new Student("s012", "coding", "E33", "manager", "23002", "ong");
+    members[12] = new Student("s013", "coding", "E33", "manager", "23003", "dong");
+    members[13] = new Student("s014", "coding", "E33", "manager", "23004", "fong");
+    members[14] = new Student("s015", "coding", "E33", "manager", "23011", "tong");
+    members[15] = new Student("s016", "coding", "E33", "manager", "23021", "nong");
+    members[16] = new Student("s017", "coding", "E33", "manager", "23031", "mong");
+    members[17] = new Student("s018", "coding", "E33", "manager", "23041", "kong");
+    members[18] = new Student("s019", "coding", "E33", "manager", "23051", "long");
+    members[19] = new Student("s020", "coding", "E33", "manager", "23101", "pong");
+    members[20] = new Student("s021", "coding", "E53", "manager", "23141", "lim");
+    members[21] = new Student("s022", "coding", "E53", "manager", "23241", "mim");
+    members[22] = new Student("s023", "coding", "E53", "manager", "23341", "bim");
+    members[23] = new Student("s024", "coding", "E53", "manager", "23441", "dim");
+    members[24] = new Student("s025", "coding", "E53", "manager", "23541", "rim");
+    members[25] = new Student("s026", "coding", "E53", "manager", "23641", "qim");
+    members[26] = new Student("s021", "coding", "E53", "manager", "23741", "fim");
+    members[27] = new Student("s021", "coding", "E53", "manager", "23841", "him");
+    members[28] = new Student("s027", "coding", "E53", "manager", "23941", "jim");
+    members[29] = new Student("s027", "coding", "E53", "manager", "24041", "jjj");
+
     while (1)
     {
-        cout << "\n¼±ÅÃ 1: member  °´Ã¼ 30°³ ÀÔ·Â, 2.table Ãâ·Â, 3: table °´Ã¼ Ã£±â,4. table¿¡¼­ °´Ã¼ »èÁ¦, 5. Á¾·á" << endl;
+        cout << "\nì„ íƒ 1: member  ê°ì²´ 30ê°œ ì…ë ¥, 2.table ì¶œë ¥, 3: table ê°ì²´ ì°¾ê¸°,4. tableì—ì„œ ê°ì²´ ì‚­ì œ, 5. ì¢…ë£Œ" << endl;
         cin >> select;
         switch (select) {
-        case 1://table¿¡ °´Ã¼ 30°³ ÀÔ·Â
-            members[0] = new Coder("p1", "hong", "E1", "Coding", "C++");
-            members[1] = new Coder("p2", "hee", "E2", "Coding", "C++");
-            members[2] = new Coder("p3", "kim", "E3", "Test", "JAVA");
-            members[3] = new Coder("p4", "lee", "E4", "Test", "C#");
-            members[4] = new Coder("p5", "ko", "E5", "Design", "GO");
-            members[5] = new Coder("p6", "choi", "E6", "Design", "GO");
-            members[6] = new Coder("p7", "han", "E7", "Sales", "PYTHON");
-            members[7] = new Coder("p8", "na", "E8", "Sales", "C");
-            members[8] = new Coder("p9", "you", "E9", "Account", "C++");
-            members[9] = new Coder("p10", "song", "E10", "Production", "C#");
-            members[10] = new Student("s011", "coding", "E33", "manager", "23001", "hong");
-            members[11] = new Student("s012", "coding", "E33", "manager", "23002", "ong");
-            members[12] = new Student("s013", "coding", "E33", "manager", "23003", "dong");
-            members[13] = new Student("s014", "coding", "E33", "manager", "23004", "fong");
-            members[14] = new Student("s015", "coding", "E33", "manager", "23011", "tong");
-            members[15] = new Student("s016", "coding", "E33", "manager", "23021", "nong");
-            members[16] = new Student("s017", "coding", "E33", "manager", "23031", "mong");
-            members[17] = new Student("s018", "coding", "E33", "manager", "23041", "kong");
-            members[18] = new Student("s019", "coding", "E33", "manager", "23051", "long");
-            members[19] = new Student("s020", "coding", "E33", "manager", "23101", "pong");
-            members[20] = new Student("s021", "coding", "E53", "manager", "23141", "lim");
-            members[21] = new Student("s022", "coding", "E53", "manager", "23241", "mim");
-            members[22] = new Student("s023", "coding", "E53", "manager", "23341", "bim");
-            members[23] = new Student("s024", "coding", "E53", "manager", "23441", "dim");
-            members[24] = new Student("s025", "coding", "E53", "manager", "23541", "rim");
-            members[25] = new Student("s026", "coding", "E53", "manager", "23641", "qim");
-            members[26] = new Student("s021", "coding", "E53", "manager", "23741", "fim");
-            members[27] = new Student("s021", "coding", "E53", "manager", "23841", "him");
-            members[28] = new Student("s027", "coding", "E53", "manager", "23941", "jim");
-            members[29] = new Student("s027", "coding", "E53", "manager", "24041", "jjj");
-
-
+        case 1:
             for (int i = 0; i < 30; i++)
             {
                 table.Add(members[i]);
@@ -177,24 +368,24 @@ int main() {
             }
             break;
         case 2:
-            // tableÀÇ ¸ğµç °´Ã¼ Ãâ·ÂÇÏ±â
-            //table ¸ğ¾çÀ¸·Î Ãâ·ÂÇØ¾ß ÇÑ´Ù: | *** | ???? | === |À¸·Î Ãâ·ÂÇÑ´Ù.
+            // tableì˜ ëª¨ë“  ê°ì²´ ì¶œë ¥í•˜ê¸°
+            //table ëª¨ì–‘ìœ¼ë¡œ ì¶œë ¥í•´ì•¼ í•œë‹¤: | *** | ???? | === |ìœ¼ë¡œ ì¶œë ¥í•œë‹¤.
 
             table.Print();
             break;
         case 3:
-            // table¿¡¼­ °´Ã¼ Ã£±â
+            // tableì—ì„œ ê°ì²´ ì°¾ê¸°
 
             p = table.Search("kim");
-            if (p == nullptr) cout << "kimÀÌ Á¸ÀçÇÏÁö ¾Ê´Â´Ù" << endl;
+            if (p == nullptr) cout << "kimì´ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤" << endl;
             else
                 p->Print();
             break;
         case 4:
-            //table¿¡¼­ °´Ã¼ »èÁ¦ÇÏ±â
+            //tableì—ì„œ ê°ì²´ ì‚­ì œí•˜ê¸°
             result = table.Delete("hong");
-            if (result > 0)
-                cout << "»èÁ¦µÈ records ¼ıÀÚ" << result << endl;
+            if (result >= 0)
+                cout << "ì‚­ì œëœ records ìˆ«ì" << result << endl;
 
             break;
 
