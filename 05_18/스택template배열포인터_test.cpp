@@ -10,13 +10,21 @@ class Person {
     string pid;
     string pname;
 public:
-    Person() {}
+    Person(string pid = "none", string pname = "none") : pid(pid), pname(pname) {}
+    ~Person() {}
 
+    friend ostream& operator<<(ostream&, Person&);
 };
+ostream& operator<<(ostream& ostream, Person& p) {
+    ostream << "| " << p.pid << " | " << p.pname << " |" << endl;
+
+    return ostream;
+}
 class Student : public Person {
     string deptName;
 public:
-    
+    Student(string pid = "none", string pname = "none", string deptName = "none") : Person(pid, pname), deptName(deptName) {}
+    ~Student() {}
 };
 
 template <class T>
@@ -24,30 +32,55 @@ class Stack {
     T* data[50];
     int nElements;
 public:
-    Stack();
+    Stack() {
+        nElements = 0;
+        for (int i = 0; i < 50; i++) {
+            data[i] = nullptr;
+        }
+    }
 
     void Push(T* elem);
     T* Pop();
     int Number();
     int Empty();
 };
+template <typename T>
+void Stack<T>::Push(T* elem) {
+    data[nElements] = elem;
+    nElements++;
+}
+template <typename T>
+T* Stack<T>::Pop() {
+    if (!this->Empty()) {
+        nElements--;
+        return data[nElements];
+    }
 
-
+    return nullptr;
+}
+template <typename T>
+int Stack<T>::Number() {
+    return nElements;
+}
+template <typename T>
+int Stack<T>::Empty() {
+    return (nElements == 0);
+}
 
 void main() {
     Stack <int> intStack;
-    /*
-    intStack.Push(50);
-    intStack.Push(19);
-    intStack.Push(3);
-    intStack.Push(10);
-    intStack.Push('aa');
+    
+    intStack.Push(new int(50));
+    intStack.Push(new int(19));
+    intStack.Push(new int(3));
+    intStack.Push(new int(10));
+    intStack.Push(new int('aa'));
 
     cout << "-----int type stack" << endl;
     while (!intStack.Empty()) {
-        cout << intStack.Pop() << endl;
+        cout << *intStack.Pop() << endl;
     }
-    */
+    
     Stack <double> doubleStack;
     /*
     doubleStack.Push(500.8);
