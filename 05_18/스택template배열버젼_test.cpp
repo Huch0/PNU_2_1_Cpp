@@ -6,12 +6,21 @@ class Person {
     string pid;
     string pname;
 public:
+    Person(string pid = "none", string pname = "none") : pid(pid), pname(pname) {}
+    ~Person() {}
 
+    friend ostream& operator<<(ostream&, Person&);
 };
+ostream& operator<<(ostream& ostream, Person& p) {
+    ostream << "| " << p.pid << " | " << p.pname << " |" << endl;
+
+    return ostream;
+}
 class Student : public Person {
     string deptName;
-public:
-   
+public: 
+    Student(string pid = "none", string pname = "none", string deptName = "none") : Person(pid, pname), deptName(deptName) {}
+    ~Student() {}
 };
 
 template <class T>
@@ -19,7 +28,10 @@ class Stack {
     T data[50];
     int nElements;
 public:
-    Stack();
+    Stack() {
+        nElements = 0;
+    }
+    ~Stack() {}
 
     void Push(T elem);
     T Pop();
@@ -27,13 +39,28 @@ public:
     int Empty();
 };
 
+template <class T>
+void Stack <T>::Push(T elem) {
+    data[nElements] = elem;
+    nElements++;
+}
+template <typename T>
+T Stack<T>::Pop() {
+    if (!this->Empty()) {
+        nElements--;
+        return data[nElements];
+    }
 
-
+    return T();
+}
+template <typename T>
+int Stack<T>::Number() {
+    return nElements;
+}
 template <class T>
 int Stack <T>::Empty() {
     return (nElements == 0);
 }
-
 
 void main() {
     Stack <int> intStack;
