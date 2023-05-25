@@ -6,7 +6,7 @@
 #define DefaultSize 50
 using namespace std;
 class Employee;
-class Person { 
+class Person {
     string pid;
     string pname;
 public:
@@ -26,9 +26,9 @@ private:
     string role;
 public:
     Employee(string pid = "---", string pname = "---", \
-                string eno = "---", string role = "---") \
-        :Person(pid, pname), \
-         eno(eno), role(role) {}
+        string eno = "---", string role = "---") \
+        : Person(pid, pname), \
+        eno(eno), role(role) {}
     ~Employee() {}
 
     virtual void Print();
@@ -144,7 +144,7 @@ int Bag<T>::Delete(char* str) {
     if (num_of_deleted)
         return num_of_deleted;
 
-    cout << "There is no " << str << endl;
+    //cout << "There is no " << str << endl;
     return 0;
 }
 template <typename T>
@@ -158,14 +158,14 @@ T* Bag<T>::Search(char* str) {
             return arr[i];
         }
     }
-    cout << "There is no " << str << endl;
+    //cout << "There is no " << str << endl;
     return nullptr;
 }
 
 template <typename T>
 class Set : public Bag<T> {
 public:
-    Set<T>(int setSize) :Bag<T>(setSize) {}
+    Set<T>(int setSize) : Bag<T>(setSize) {}
     int Add(T*);
     int Delete(char*);
     void Print();
@@ -238,7 +238,7 @@ class RecordTable {
     RecordSet<T>** data;
     int capacity; // 각 record set의 인자 수
 public:
-    RecordTable<T>(int numberSet, int numberRecords) :tableMaxSize(numberSet), capacity(numberRecords) {
+    RecordTable<T>(int numberSet, int numberRecords) : tableMaxSize(numberSet), capacity(numberRecords) {
         topRecordTable = 0;
         data = new RecordSet<T> * [numberSet];//10개의 set
         for (int i = 0; i < numberSet; i++) {
@@ -257,7 +257,7 @@ int RecordTable<T>::Add(T* p) {
             continue;
         else {
             int result = data[i]->Add(p);
-            
+
             if (data[i]->IsFull())
                 topRecordTable++;
 
@@ -340,7 +340,7 @@ int main() {
     workers[16] = new WorkStudent("s021", "coding", "fim");
     workers[17] = new WorkStudent("s021", "coding", "him");
     workers[18] = new WorkStudent("s027", "coding", "jim");
-    workers[19] = new WorkStudent("s027", "coding", "jjj"); 
+    workers[19] = new WorkStudent("s027", "coding", "jjj");
     while (1)
     {
         cout << "\n선택 1: member  객체 30개 입력, 2.table 출력, 3: table 객체 찾기,4. table에서 객체 삭제, 5. 종료" << endl;
