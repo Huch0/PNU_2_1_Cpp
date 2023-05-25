@@ -341,6 +341,7 @@ int main() {
     workers[17] = new WorkStudent("s021", "coding", "him");
     workers[18] = new WorkStudent("s027", "coding", "jim");
     workers[19] = new WorkStudent("s027", "coding", "jjj");
+
     while (1)
     {
         cout << "\n선택 1: member  객체 30개 입력, 2.table 출력, 3: table 객체 찾기,4. table에서 객체 삭제, 5. 종료" << endl;
