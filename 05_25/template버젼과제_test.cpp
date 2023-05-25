@@ -10,8 +10,14 @@ class Person {
     string pid;
     string pname;
 public:
+    Person(string pid = "---", string pname = "---") : pid(pid), pname(pname) {}
+    ~Person() {}
+
     string GetName() { return pname; }
     void SetName(char* str) { pname = str; }
+    void Print() {
+        cout << "| " << pid << " | " << pname << " | ";
+    }
 };
 
 class Employee : public Person {
@@ -19,38 +25,52 @@ private:
     string eno;
     string role;
 public:
-    Employee() :Person() {}
-    
+    Employee(string pid = "---", string pname = "---", \
+                string eno = "---", string role = "---") \
+        :Person(pid, pname), \
+         eno(eno), role(role) {}
+    ~Employee() {}
+
     virtual void Print();
     virtual bool Equals(Employee* p);
 };
 bool Employee::Equals(Employee* p) {
-
+    return this->eno == p->eno && this->role == p->role;
 }
 void Employee::Print() {
-    
+    Person::Print();
+    cout << eno << " | " << role << " |" << endl;
 }
-
 
 class Student {
 private:
     string sid;
     string major;
 public:
-   void Print();
+    Student(string sid = "---", string major = "---") : sid(sid), major(major) {}
+    ~Student() {}
+    void Print();
 };
 void Student::Print() {
-  
-    
+    cout << "| " << sid << " | " << major << " | ";
 }
+
 class WorkStudent : public Student {
 private:
     string job;
 public:
-     void Print();
+    WorkStudent(string sid = "---", string major = "---", string job = "---") \
+        : Student(sid, major), job(job) {}
+    void Print();
+    string GetName() { return job; }
 };
 
+void WorkStudent::Print() {
+    Student::Print();
+    cout << job << " |" << endl;
+}
 
+template <typename T>
 class Bag {
 public:
     virtual int Add(T*); // 정수 하나를 bag에 삽입
@@ -80,112 +100,207 @@ protected:
     }
     // */
 };
-Bag::Bag(int bagSize) : bagMaxSize(bagSize) {
+
+template <typename T>
+Bag<T>::Bag(int bagSize) {
+    bagMaxSize = bagSize;
     topBag = 0;
     arr = new T * [bagSize];
-  
 }
-void Bag::Print() {
+template <typename T>
+bool Bag<T>::IsFull() {
+    return this->topBag == this->bagMaxSize;
+}
+template <typename T>
+bool Bag<T>::IsEmpty() {
+    return this->topBag == 0;
+}
+template <typename T>
+void Bag<T>::Print() {
+    for (int i = 0; i < topBag; i++) {
+        arr[i]->Print();
+    }
+}
+template <typename T>
+int Bag<T>::Add(T* x) {
+    if (this->IsFull())
+        return 0;
 
+    arr[topBag] = x;
+    topBag++;
+    return 1;
+}
+template <typename T>
+int Bag<T>::Delete(char* str) {
+    int num_of_deleted = 0;
+
+    for (int i = 0; i < topBag; i++) {
+        if (arr[i]->GetName() == str) {
+            delete arr[i];
+            arr[i] = new T();
+            num_of_deleted++;
+        }
+    }
+    if (num_of_deleted)
+        return num_of_deleted;
+
+    cout << "There is no " << str << endl;
+    return 0;
+}
+template <typename T>
+int Bag<T>::Top() {
+    return this->topBag;
+}
+template <typename T>
+T* Bag<T>::Search(char* str) {
+    for (int i = 0; i < topBag; i++) {
+        if (arr[i]->GetName() == str) {
+            return arr[i];
+        }
+    }
+    cout << "There is no " << str << endl;
+    return nullptr;
 }
 
-
-
-
-
-int Bag::Add(T* x) {
-
-}
-
-int Bag::Delete(char* str) {
-  
-}
-
-int Bag::Top() {
-   
-}
-
-T* Bag::Search(char* str) {
- 
-}
-
-class Set : public Bag {
+template <typename T>
+class Set : public Bag<T> {
 public:
-    Set(int setSize) :Bag(setSize) {}
+    Set<T>(int setSize) :Bag<T>(setSize) {}
     int Add(T*);
     int Delete(char*);
     void Print();
     T* Search(char*);
 };
-T* Set::Search(char* str) {
- 
+template <typename T>
+T* Set<T>::Search(char* str) {
+    return Bag<T>::Search(str);
 }
-void Set::Print() {
-  
+template <typename T>
+void Set<T>::Print() {
+    Bag<T>::Print();
+}
+template <typename T>
+int Set<T>::Add(T* p) {
+    for (int i = 0; i < bagMaxSize; i++) {
+        if (arr[i] == p) {
+            cout << "already exists" << endl;
+            return 0;
+        }
+    }
+    return Bag<T>::Add(p);
+}
+template <typename T>
+int Set<T>::Delete(char* str) {
+    return Bag<T>::Delete(str);
 }
 
-int Set::Add(T* p) {
-
-}
-
-int Set::Delete(char* str) {
-   
-
-}
-
-class RecordSet : public Set {
+template <typename T>
+class RecordSet : public Set<T> {
     int setMaxSize;//5개의 레코드 수
     int topRecordSet;//해당 레코드세트에서 입력할 위치
 public:
-    RecordSet(int maxSize) :Set(maxSize), setMaxSize(maxSize) {
+    RecordSet<T>(int maxSize) : Set<T>(maxSize) {
+        if (maxSize > 5)
+            setMaxSize = 5;
+        else
+            setMaxSize = maxSize;
+
         topRecordSet = 0;
     }
+    ~RecordSet() {}
+
     T* Search(char*);
     void Print();
     int Add(T* p);
 };
-T* RecordSet::Search(char* str) {
-
+template <typename T>
+T* RecordSet<T>::Search(char* str) {
+    return Set<T>::Search(str);
 }
-int RecordSet::Add(T* p) {
+template <typename T>
+int RecordSet<T>::Add(T* p) {
+    int result = Set::Add(p);
+    if (result) {
+        topRecordSet += 1;
+    }
 
+    return result;
 }
-void RecordSet::Print() {
-  
+template <typename T>
+void RecordSet<T>::Print() {
+    Set<T>::Print();
 }
 
+template <typename T>
 class RecordTable {
-    int tableMaxSize;
-    int topRecordTable;
-    RecordSet** data;
-    int capacity;
+    int tableMaxSize; // record set 개수
+    int topRecordTable; // g
+    RecordSet<T>** data;
+    int capacity; // 각 record set의 인자 수
 public:
-    RecordTable(int numberSet, int numberRecords) :tableMaxSize(numberSet), capacity(numberRecords) {
+    RecordTable<T>(int numberSet, int numberRecords) :tableMaxSize(numberSet), capacity(numberRecords) {
         topRecordTable = 0;
-        data = new RecordSet * [numberSet];//10개의 set
+        data = new RecordSet<T> * [numberSet];//10개의 set
         for (int i = 0; i < numberSet; i++) {
-            data[i] = new RecordSet(numberRecords);//각 set는 5개 records
+            data[i] = new RecordSet<T>(numberRecords);//각 set는 5개 records
         }
-
-
     }
     int Add(T*); // 정수 하나를 bag에 삽입
     int Delete(char*);
     T* Search(char*);
     void Print();
 };
-int RecordTable::Delete(char* str) {
-    
+template <typename T>
+int RecordTable<T>::Add(T* p) {
+    for (int i = topRecordTable; i < tableMaxSize; i++) {
+        if (data[i]->IsFull())
+            continue;
+        else {
+            int result = data[i]->Add(p);
+            
+            if (data[i]->IsFull())
+                topRecordTable++;
 
-}//bag에서 정수 하나를 삭제
-int RecordTable::Add(T* p) {
-  
+            return result;
+        }
+    }
+    cout << "Record Table is Full" << endl;
+    return 0;
 }
-void RecordTable::Print() {
-  
+
+template <typename T>
+int RecordTable<T>::Delete(char* str) {
+    int num_of_deleted = 0;
+    for (int i = 0; i < topRecordTable; i++) {
+        int result = data[i]->Delete(str);
+
+        if (result) {
+            num_of_deleted += result;
+        }
+    }
+
+    return num_of_deleted;
 }
-T* RecordTable::Search(char* str) {
-   
+//bag에서 정수 하나를 삭제
+
+template <typename T>
+void RecordTable<T>::Print() {
+    for (int i = 0; i < topRecordTable; i++) {
+        cout << "Record set no." << i << endl;
+        data[i]->Print();
+    }
+}
+template <typename T>
+T* RecordTable<T>::Search(char* str) {
+    T* result = nullptr;
+    for (int i = 0; i < topRecordTable; i++) {
+        result = data[i]->Search(str);
+
+        if (result) {
+            return result;
+        }
+    }
+    return result;
 }
 
 int main() {
@@ -196,44 +311,42 @@ int main() {
     int select;
     Employee* e; WorkStudent* ws;
     int result;
+    members[0] = new Employee("p1", "hong", "E1", "Coding");
+    members[1] = new Employee("p2", "hee", "E2", "Coding");
+    members[2] = new Employee("p3", "kim", "E3", "Test");
+    members[3] = new Employee("p4", "lee", "E4", "Test");
+    members[4] = new Employee("p5", "ko", "E5", "Design");
+    members[5] = new Employee("p6", "choi", "E6", "Design");
+    members[6] = new Employee("p7", "han", "E7", "Sales");
+    members[7] = new Employee("p8", "na", "E8", "Sales");
+    members[8] = new Employee("p9", "you", "E9", "Account");
+    members[9] = new Employee("p10", "song", "E10", "Production");
+    workers[0] = new WorkStudent("s011", "coding", "hong");
+    workers[1] = new WorkStudent("s012", "coding", "ong");
+    workers[2] = new WorkStudent("s013", "coding", "dong");
+    workers[3] = new WorkStudent("s014", "coding", "fong");
+    workers[4] = new WorkStudent("s015", "coding", "tong");
+    workers[5] = new WorkStudent("s016", "coding", "nong");
+    workers[6] = new WorkStudent("s017", "coding", "mong");
+    workers[7] = new WorkStudent("s018", "coding", "kong");
+    workers[8] = new WorkStudent("s019", "coding", "long");
+    workers[9] = new WorkStudent("s020", "coding", "pong");
+    workers[10] = new WorkStudent("s021", "coding", "lim");
+    workers[11] = new WorkStudent("s022", "coding", "mim");
+    workers[12] = new WorkStudent("s023", "coding", "bim");
+    workers[13] = new WorkStudent("s024", "coding", "dim");
+    workers[14] = new WorkStudent("s025", "coding", "rim");
+    workers[15] = new WorkStudent("s026", "coding", "qim");
+    workers[16] = new WorkStudent("s021", "coding", "fim");
+    workers[17] = new WorkStudent("s021", "coding", "him");
+    workers[18] = new WorkStudent("s027", "coding", "jim");
+    workers[19] = new WorkStudent("s027", "coding", "jjj"); 
     while (1)
     {
         cout << "\n선택 1: member  객체 30개 입력, 2.table 출력, 3: table 객체 찾기,4. table에서 객체 삭제, 5. 종료" << endl;
         cin >> select;
         switch (select) {
         case 1://table에 객체 30개 입력
-            members[0] = new Employee("p1", "hong", "E1", "Coding");
-            members[1] = new Employee("p2", "hee", "E2", "Coding");
-            members[2] = new Employee("p3", "kim", "E3", "Test");
-            members[3] = new Employee("p4", "lee", "E4", "Test");
-            members[4] = new Employee("p5", "ko", "E5", "Design");
-            members[5] = new Employee("p6", "choi", "E6", "Design");
-            members[6] = new Employee("p7", "han", "E7", "Sales");
-            members[7] = new Employee("p8", "na", "E8", "Sales");
-            members[8] = new Employee("p9", "you", "E9", "Account");
-            members[9] = new Employee("p10", "song", "E10", "Production");
-            workers[0] = new WorkStudent("s011", "coding", "hong");
-            workers[1] = new WorkStudent("s012", "coding",  "ong");
-            workers[2] = new WorkStudent("s013", "coding",  "dong");
-            workers[3] = new WorkStudent("s014", "coding",  "fong");
-            workers[4] = new WorkStudent("s015", "coding",  "tong");
-            workers[5] = new WorkStudent("s016", "coding",  "nong");
-            workers[6] = new WorkStudent("s017", "coding",  "mong");
-            workers[7] = new WorkStudent("s018", "coding",  "kong");
-            workers[8] = new WorkStudent("s019", "coding",  "long");
-            workers[9] = new WorkStudent("s020", "coding",  "pong");
-            workers[10] = new WorkStudent("s021", "coding",  "lim");
-            workers[11] = new WorkStudent("s022", "coding",  "mim");
-            workers[12] = new WorkStudent("s023", "coding",  "bim");
-            workers[13] = new WorkStudent("s024", "coding",  "dim");
-            workers[14] = new WorkStudent("s025", "coding", "rim");
-            workers[15] = new WorkStudent("s026", "coding", "qim");
-            workers[16] = new WorkStudent("s021", "coding",  "fim");
-            workers[17] = new WorkStudent("s021", "coding",  "him");
-            workers[18] = new WorkStudent("s027", "coding",  "jim");
-            workers[19] = new WorkStudent("s027", "coding",  "jjj");
-
-
             for (int i = 0; i < 10; i++)
             {
                 etable.Add(members[i]);
