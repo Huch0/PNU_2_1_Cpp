@@ -102,6 +102,7 @@ public:
         for (int i = 0; i < top; i++) {
             delete arr[i];
         }
+        cout << "~Bag() " << endl;
     }
     virtual void Add(Person*); // 정수 하나를 bag에 삽입
     virtual Person* Delete(); //bag에서 정수 하나를 삭제
@@ -301,6 +302,7 @@ int main() {
             Show(members);
             break;
         default:
+            s.~Set();
             exit(0);
 
         }

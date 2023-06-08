@@ -1,24 +1,21 @@
 /*
-* ê°ì²´ë“¤ì˜ Setì„ í¬í•¨í•˜ëŠ” í…Œì´ë¸”ì˜ ë°°ì—´ì„ ê°–ëŠ” í´ë˜ìŠ¤ êµ¬í˜„í•˜ê¸° 
+* °´Ã¼µéÀÇ SetÀ» Æ÷ÇÔÇÏ´Â Å×ÀÌºíÀÇ ¹è¿­À» °®´Â Å¬·¡½º ±¸ÇöÇÏ±â 
 */
 #include <iostream>
 #include <string>
 #define DefaultSize 50
 using namespace std;
-class Person { //ì¶”ìƒ í´ë˜ìŠ¤ë¡œ êµ¬í˜„í•œë‹¤
+
+class Person { //Ãß»ó Å¬·¡½º·Î ±¸ÇöÇÑ´Ù
 private:
     string pid;
     string pname;
 public:
     Person() {}
     Person(string pid, string pname) : pid(pid), pname(pname) { }
-
+    virtual void Print() = 0;
     virtual ~Person() {}
 
-    virtual void Print() {
-        cout << "|" << pid << "|" << pname << "|";
-    }
-    //virtual void Show() = 0;
 };
 
 
@@ -73,49 +70,54 @@ public:
 };
 void PartTimeStudent::Print() {
     Student::Print();
-    cout << "| " << workType<<" |";
+    cout << "| " << workType<<" |"
+        ;;
 }
 
 
 class Bag {
 public:
-    Bag(int MaxSize = DefaultSize); //ìƒì„±ì
-    ~Bag(); // ì†Œë©¸ì
-    virtual void Add(Person*); // ì •ìˆ˜ í•˜ë‚˜ë¥¼ bagì— ì‚½ì…
-    virtual Person* Delete(char*); //bagì—ì„œ ì •ìˆ˜ í•˜ë‚˜ë¥¼ ì‚­ì œ
+    Bag(int MaxSize = DefaultSize); //»ı¼ºÀÚ
+    ~Bag(); // ¼Ò¸êÀÚ
+    virtual void Add(Person*); // Á¤¼ö ÇÏ³ª¸¦ bag¿¡ »ğÀÔ
+    virtual Person* Delete(char*); //bag¿¡¼­ Á¤¼ö ÇÏ³ª¸¦ »èÁ¦
     virtual Person* Search(char*);
     bool IsFull();
-    // bagì´ í¬í™”ìƒíƒœì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜
+    // bagÀÌ Æ÷È­»óÅÂÀÌ¸é true, ±×·¸Áö ¾ÊÀ¸¸é false¸¦ ¹İÈ¯
     bool IsEmpty();
-    // bagì´ ê³µë°± ìƒíƒœì´ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜
+    // bagÀÌ °ø¹é »óÅÂÀÌ¸é true, ±×·¸Áö ¾ÊÀ¸¸é false¸¦ ¹İÈ¯
     int Top();
     virtual void Print();
 protected:
     Bag(int bagSize) : bagMaxSize(bagSize) {
+        arr = new Person[bagSize];
+    }
+    /*
+       Bag(int bagSize) : bagMaxSize(bagSize) {
         arr = new Person*[bagSize];
         for (int i = 0; i < bagSize; i++){
             arr[i] = new Person();
         }
     }
+    */
+    void Full(); // bagÀÌ Æ÷È­»óÅÂÀÏ ¶§ÀÇ Á¶Ä¡
+    void Empty(); // bagÀÌ °ø¹é »óÅÂÀÏ ¶§ÀÇ Á¶Ä¡
+    /*
+    * Person *arr[] > µ¿ÀûÀ¸·Î ÇÒ´çµÈ ¹è¿­À» ¸â¹ö º¯¼ö·Î °®´Â Æ÷ÀÎÅÍ »ç¿ë
+    * Person **arr; > »ı¼ºÀÚ¿¡¼­ arr = new Person*[Size]; > arr[i] = new Person();
+    */
+    Person* arr[];
+    //Person **arr;
+    int bagMaxSize; // ¹è¿­ÀÇ Å©±â
+    int topBag; // ¹è¿­¿¡¼­ ¿ø¼Ò°¡ µé¾î ÀÖ´Â °¡Àå ³ôÀº À§Ä¡
+    /*
     ~Bag(){
         for (int i =0; i < bagMaxSize; i++) {
            delete arr[i];
         }
-        delete [] arr;  
+        delete [] arr;
     }
-    void Full(); // bagì´ í¬í™”ìƒíƒœì¼ ë•Œì˜ ì¡°ì¹˜
-    void Empty(); // bagì´ ê³µë°± ìƒíƒœì¼ ë•Œì˜ ì¡°ì¹˜
-    /*
-    * Person *arr[] > ë™ì ìœ¼ë¡œ í• ë‹¹ëœ ë°°ì—´ì„ ë©¤ë²„ ë³€ìˆ˜ë¡œ ê°–ëŠ” í¬ì¸í„° ì‚¬ìš©
-    * Person **arr; > ìƒì„±ìì—ì„œ arr = new Person*[Size]; > arr[i] = new Person();
     */
-    Person** arr;
-    //Person **arr;
-    int bagMaxSize; // ë°°ì—´ì˜ í¬ê¸°
-    int topBag; // ë°°ì—´ì—ì„œ ì›ì†Œê°€ ë“¤ì–´ ìˆëŠ” ê°€ì¥ ë†’ì€ ìœ„ì¹˜
-    
-   
-    
 };
 
 void Bag::Print() {
@@ -127,24 +129,24 @@ void Bag::Print() {
 class Set : public Bag {
     
 public:
-    Set(int MaxSize = DefaultSize);      //ìƒì„±ì
-    ~Set();      // ì†Œë©¸ì
-                 //Set ìë£Œêµ¬ì¡°ì— ë§ê²Œ Add(), Delete() í•¨ìˆ˜ ì¬ì •ì˜
+    Set(int MaxSize = DefaultSize);      //»ı¼ºÀÚ
+    ~Set();      // ¼Ò¸êÀÚ
+                 //Set ÀÚ·á±¸Á¶¿¡ ¸Â°Ô Add(), Delete() ÇÔ¼ö ÀçÁ¤ÀÇ
     void Add(Person*);
     Person* Delete(char*);
     void Print();
 
 };
 void Set::Print() {
-    for (int i= 0; i < topBag; i++) {
-        arr[i].Print();
+    for (int = 0; i < topBag; i++) {
+        arr[p].Print();
     }
 }
 class RecordSet : public Set {
     int setMaxSize;
     int topRecordSet;
 public:
-    RecordSet(int maxSize) : Set(maxSize), setMaxSize(maxSize) {
+    RecordSet(int maxSize) :Set(maxSize), setMaxSize(maxSize) {
         topRecordSet = 0;
     }
     Person* Search(char *);
@@ -152,7 +154,7 @@ public:
 };
 void RecordSet::Print() {
     if (topRecordSet <= 0) {
-        cout << "Setì— ë ˆì½”ë“œê°€ ì—†ë‹¤" << endl;
+        cout << "Set¿¡ ·¹ÄÚµå°¡ ¾ø´Ù" << endl;
         return;
     }
     Set::Print();
@@ -162,11 +164,11 @@ class RecordTable {
     int topRecordTable;
     Set* data[];
 public:
-    RecordTable(int numberSet) : tableMaxSize(numberSet) {
+    RecordTable(int numberSet) :tableMaxSize(numberSet) {
         data = new RecordSet(5);
     }
-    void Add(Person*); // ì •ìˆ˜ í•˜ë‚˜ë¥¼ bagì— ì‚½ì…
-    Person* Delete(char*); //bagì—ì„œ ì •ìˆ˜ í•˜ë‚˜ë¥¼ ì‚­ì œ
+    void Add(Person*); // Á¤¼ö ÇÏ³ª¸¦ bag¿¡ »ğÀÔ
+    Person* Delete(char*); //bag¿¡¼­ Á¤¼ö ÇÏ³ª¸¦ »èÁ¦
     Person* Search(char*);
     void Print();
 };
@@ -178,13 +180,13 @@ Person* Search(char* str) {
     return nullptr;
 }
 Bag::Bag(int MaxBagSize) : bagMaxSize(MaxBagSize) {
-    cout << "Bag::ìƒì„±ì í˜¸ì¶œ" << endl;
+    cout << "Bag::»ı¼ºÀÚ È£Ãâ" << endl;
     topBag = 0;
 
 }
 
 Bag::~Bag() {
-    cout << "~Bag()í˜¸ì¶œë¨" << endl;
+    cout << "~Bag()È£ÃâµÊ" << endl;
 }
 
 bool Bag::IsFull() {
@@ -214,7 +216,7 @@ void Bag::Add(Person* x) {
         Full();
     else {
         arr[topBag] = x;
-        cout << "BAGì— " << arr[topBag] << "ì´ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤" << endl;
+        cout << "BAG¿¡ " << arr[topBag] << "ÀÌ Ãß°¡µÇ¾ú½À´Ï´Ù" << endl;
         topBag++;
     }
 }
@@ -261,12 +263,12 @@ void Set::Add(Person* x) {
         for (int i = 0; i < MaxSize; i++) {
             if (!(arr[i] == x)) {
                 arr[top] = x;
-                cout << "SETì— " << arr[top] << "ì´ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤" << endl;
+                cout << "SET¿¡ " << arr[top] << "ÀÌ Ãß°¡µÇ¾ú½À´Ï´Ù" << endl;
                 top++;
                 return;
             }
             else {
-                cout << "ì¤‘ë³µëœ ê°’ ì…ë‹ˆë‹¤" << endl;
+                cout << "Áßº¹µÈ °ª ÀÔ´Ï´Ù" << endl;
                 return;
             }
         }
@@ -275,7 +277,7 @@ void Set::Add(Person* x) {
 }
 
 Person* Set::Delete(char* str) {
-    // Set::Search(str)ë¥¼ í˜¸ì¶œí•œë‹¤.
+    // Set::Search(str)¸¦ È£ÃâÇÑ´Ù.
     //if (IsEmpty()) {
      //   Empty();
      //   return x;
@@ -289,17 +291,17 @@ Person* Set::Delete(char* str) {
 }
 
 int main() {
-    Person* members[30];//Person ì„ ì–¸ìœ¼ë¡œ ë³€ê²½í•˜ëŠ” ë¬¸ì œ í•´ê²° í•„ìš” 
+    Person* members[30];//Person ¼±¾ğÀ¸·Î º¯°æÇÏ´Â ¹®Á¦ ÇØ°á ÇÊ¿ä 
     RecordTable table(10);
     int select;
     Person* p;
 
     while (1)
     {
-        cout << "\nì„ íƒ 1: member  ê°ì²´ 30ê°œ ì…ë ¥, 2.table ì¶œë ¥, 3: table ê°ì²´ ì°¾ê¸°,4. tableì—ì„œ ê°ì²´ ì‚­ì œ, 5. members ë°°ì—´ show í•¨ìˆ˜, 6. ì¢…ë£Œ" << endl;
+        cout << "\n¼±ÅÃ 1: member  °´Ã¼ 30°³ ÀÔ·Â, 2.table Ãâ·Â, 3: table °´Ã¼ Ã£±â,4. table¿¡¼­ °´Ã¼ »èÁ¦, 5. members ¹è¿­ show ÇÔ¼ö, 6. Á¾·á" << endl;
         cin >> select;
         switch (select) {
-        case 1://tableì— ê°ì²´ 30ê°œ ì…ë ¥
+        case 1://table¿¡ °´Ã¼ 30°³ ÀÔ·Â
             members[0] = new Coder("p1", "hong", "E1", "Coding", "C++");
             members[1] = new Coder("p2", "hee", "E2", "Coding", "C++");
             members[2] = new Coder("p3", "kim", "E3", "Test", "JAVA");
@@ -313,23 +315,23 @@ int main() {
             members[10] = new PartTimeStudent("coding", "s001", "computer", "23001", "hong");
             members[11] = new PartTimeStudent("designer", "s002", "DB", "23002", "song");
             members[12] = new PartTimeStudent("tester", "s003", "Java", "23003", "kim");
-            members[13] = new PartTimeStudent("manager", "s004", "ê¸°ê³„", "13001", "gildong");
-            members[14] = new PartTimeStudent("accountant", "s005", "ì „ê¸°", "33001", "gil");
-            members[15] = new PartTimeStudent("salesman", "s006", "ì˜ë¥˜", "43001", "dong");
-            members[16] = new PartTimeStudent("planner", "s007", "ì „ì", "53001", "tong");
-            members[17] = new PartTimeStudent("audit", "s008", "í™”ê³µ", "63001", "nong");
-            members[18] = new PartTimeStudent("DBA", "s009", "í™”í•™", "73001", "mong");
-            members[19] = new PartTimeStudent("DBA", "s010", "ì‚°ì—…", "231", "song");
+            members[13] = new PartTimeStudent("manager", "s004", "±â°è", "13001", "gildong");
+            members[14] = new PartTimeStudent("accountant", "s005", "Àü±â", "33001", "gil");
+            members[15] = new PartTimeStudent("salesman", "s006", "ÀÇ·ù", "43001", "dong");
+            members[16] = new PartTimeStudent("planner", "s007", "ÀüÀÚ", "53001", "tong");
+            members[17] = new PartTimeStudent("audit", "s008", "È­°ø", "63001", "nong");
+            members[18] = new PartTimeStudent("DBA", "s009", "È­ÇĞ", "73001", "mong");
+            members[19] = new PartTimeStudent("DBA", "s010", "»ê¾÷", "231", "song");
             members[20] = new PartTimeStudent("coder", "s001", "computer", "201", "hee");
             members[21] = new PartTimeStudent("coder", "s002", "DB", "001", "lee");
             members[22] = new PartTimeStudent("tester", "s003", "Java", "230", "kim");
-            members[23] = new PartTimeStudent("designer", "s004", "ê¸°ê³„", "231", "choi");
-            members[24] = new PartTimeStudent("designer", "s005", "ì „ê¸°", "201", "gam");
-            members[25] = new PartTimeStudent("AS", "s006", "ì˜ë¥˜", "2333", "go");
-            members[26] = new PartTimeStudent("coder", "s007", "ì „ì", "2222", "hg");
-            members[27] = new PartTimeStudent("audit", "s008", "í™”ê³µ", "23001", "oh");
-            members[28] = new PartTimeStudent("engineer", "s009", "í™”í•™", "2451", "nice");
-            members[29] = new PartTimeStudent("designer", "s010", "ì‚°ì—…", "9888", "good");
+            members[23] = new PartTimeStudent("designer", "s004", "±â°è", "231", "choi");
+            members[24] = new PartTimeStudent("designer", "s005", "Àü±â", "201", "gam");
+            members[25] = new PartTimeStudent("AS", "s006", "ÀÇ·ù", "2333", "go");
+            members[26] = new PartTimeStudent("coder", "s007", "ÀüÀÚ", "2222", "hg");
+            members[27] = new PartTimeStudent("audit", "s008", "È­°ø", "23001", "oh");
+            members[28] = new PartTimeStudent("engineer", "s009", "È­ÇĞ", "2451", "nice");
+            members[29] = new PartTimeStudent("designer", "s010", "»ê¾÷", "9888", "good");
 
             for (int i = 0; i < 30; i++)
             {
@@ -338,20 +340,19 @@ int main() {
             }
             break;
         case 2:
-            // tableì˜ ëª¨ë“  ê°ì²´ ì¶œë ¥í•˜ê¸°
-            //table ëª¨ì–‘ìœ¼ë¡œ ì¶œë ¥í•´ì•¼ í•œë‹¤: | *** | ???? | === |ìœ¼ë¡œ ì¶œë ¥í•œë‹¤.
+            // tableÀÇ ¸ğµç °´Ã¼ Ãâ·ÂÇÏ±â
+            //table ¸ğ¾çÀ¸·Î Ãâ·ÂÇØ¾ß ÇÑ´Ù: | *** | ???? | === |À¸·Î Ãâ·ÂÇÑ´Ù.
             table.Print();
-            break;
         case 3:
-            // tableì—ì„œ ê°ì²´ ì°¾ê¸°
+            // table¿¡¼­ °´Ã¼ Ã£±â
 
             p = table.Search("kim");
-            if (p == nullptr) cout << "kimì´ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤" << endl;
+            if (p == nullptr) cout << "kimÀÌ Á¸ÀçÇÏÁö ¾Ê´Â´Ù" << endl;
             else
                 p->Print();
             break;
         case 4:
-            //tableì—ì„œ ê°ì²´ ì‚­ì œí•˜ê¸°
+            //table¿¡¼­ °´Ã¼ »èÁ¦ÇÏ±â
             p = table.Delete("hong");
             p->Print();
 
